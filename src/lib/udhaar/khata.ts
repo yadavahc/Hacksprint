@@ -39,8 +39,8 @@ export const MAX_REMINDERS_PER_WEEK = 2;
 
 export function trustScore(e: UdhaarEntry): { score: number; tag: TrustTag; safeLimit: number } {
   const overdue = Math.max(0, -e.dueInDays);
-  const total = e.onTime + e.late || 1;
-  const score = Math.max(0, Math.min(100, Math.round(40 + (e.onTime / total) * 50 - overdue * 1.5 - (e.due > 2000 ? 10 : 0) + Math.min(e.onTime, 10))));
+  const total = e.onTime + e.late;
+  const score = Math.max(0, Math.min(100, Math.round(40 + (total ? e.onTime / total : 0.5) * 50 - overdue * 1.5 - (e.due > 2000 ? 10 : 0) + Math.min(e.onTime, 10))));
   const tag: TrustTag = score >= 70 ? "GREEN" : score >= 45 ? "AMBER" : "RED";
   const safeLimit = tag === "GREEN" ? 3000 : tag === "AMBER" ? 1000 : 0;
   return { score, tag, safeLimit };

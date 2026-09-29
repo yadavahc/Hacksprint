@@ -8,6 +8,8 @@ Built by **Team Spy** for **HackSprint** (24-hour hackathon, MAHE) · **Track 1 
 
 > **Prototype.** The merchant, customers and transactions are simulated demo data. GALLA never lends, holds or moves real money. UPI payments run on a payment gateway's **staging** environment with test money only.
 
+![GALLA landing page](docs/screenshots/landing-hero.png)
+
 ---
 
 ## The problem
@@ -50,6 +52,20 @@ Built by **Team Spy** for **HackSprint** (24-hour hackathon, MAHE) · **Track 1 
 - **Documents and catalog.** Invoice extraction to stock updates, and a voice-to-digital catalog.
 - **UPI test payments.** Collect a real staging payment from the QR tab, verified server-side.
 - **Learning loop.** Every action is audited, and campaign results feed back into future estimates.
+
+---
+
+## Screenshots
+
+| Udhaar Khata | Voice Khata: new entry logged |
+| --- | --- |
+| ![Udhaar Khata dashboard with recovery KPIs, Bazaar Pulse and Voice Khata](docs/screenshots/app-udhaar.png) | ![Voice note parsed and logged with a receipt](docs/screenshots/app-voice-khata.png) |
+| **AI recovery call (Kannada)** | **Credit Readiness Passport** |
+| ![Live AI recovery call with part-payment outcome and UPI link](docs/screenshots/app-recovery-call.png) | ![Credit readiness passport with reasons](docs/screenshots/app-credit-passport.png) |
+| **GALLA AI teammate** | **Home** |
+| ![GALLA command center](docs/screenshots/app-galla-chat.png) | ![Home screen](docs/screenshots/app-home.png) |
+| **Capabilities (landing)** | **Mobile** |
+| ![Landing page capabilities hub](docs/screenshots/landing-capabilities.png) | <img src="docs/screenshots/mobile-udhaar.png" alt="Udhaar Khata on a phone" width="260"> |
 
 ---
 

@@ -265,6 +265,7 @@ function VoiceKhataCard({ note, setNote, onLog, canRecord, onError }: { note: st
 function RecoveryCall({ entry, onDone, onPaid }: { entry: UdhaarEntry; onDone: (promise: string) => void; onPaid: (amount: number) => void }) {
   const [lang, setLang] = useState<CallLang>("kn");
   const [shown, setShown] = useState(0);
+  const [reminderNo] = useState(entry.remindersThisWeek + 1);
   const script = useMemo(() => recoveryCallScript(entry, MERCHANT.name, lang), [entry, lang]);
   const now = promisedNow(entry);
   const rest = entry.due - now;
@@ -285,7 +286,7 @@ function RecoveryCall({ entry, onDone, onPaid }: { entry: UdhaarEntry; onDone: (
     <div className="space-y-3">
       <Segmented label="Call language" value={lang} onChange={(v) => shown === 0 && setLang(v)} options={[{ value: "kn", label: "Kannada" }, { value: "hi", label: "Hindi" }, { value: "en", label: "English" }]} />
       <p className="flex items-center gap-1.5 text-[12px] font-semibold text-good">
-        <ShieldCheck className="size-4" aria-hidden /> {entry.name} opted in · reminder {entry.remindersThisWeek + 1} of 2 this week
+        <ShieldCheck className="size-4" aria-hidden /> {entry.name} opted in · reminder {reminderNo} of 2 this week
       </p>
       <div className="min-h-32 space-y-2 rounded-2xl bg-canvas p-3 text-[13.5px] leading-snug">
         {shown === 0 && <p className="text-muted">Polite, consent-based call. The agent never threatens and ends the call if asked.</p>}
