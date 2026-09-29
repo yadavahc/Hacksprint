@@ -3,11 +3,13 @@
 import { BarChart3, CircleCheck, Gift, Headset, IndianRupee, Mic, Play, ShieldAlert, ShieldCheck, Square } from "lucide-react";
 import { useEffect, useMemo, useRef, useState } from "react";
 import { ScreenHeader } from "@/components/app-shell/shell-bits";
+import { GallaBoxCard } from "@/components/hardware/GallaBox";
 import { Badge, Button, Card, ProgressBar, Segmented, Stat } from "@/components/ui/primitives";
 import { BottomSheet } from "@/components/ui/sheet";
 import { computeReadiness } from "@/lib/credit/readiness";
-import { formatINR, uid } from "@/lib/data/format";
+import { formatINR, formatNumber, uid } from "@/lib/data/format";
 import { MERCHANT } from "@/lib/data/story";
+import { send as sendToBox, useGallaBox } from "@/lib/hardware/gallaBox";
 import { useGalla } from "@/lib/store/provider";
 import { agentContext } from "@/lib/store/selectors";
 import {
@@ -71,6 +73,15 @@ export function UdhaarScreen() {
   const recoveryPct = Math.round((recovered / Math.max(1, recovered + outstanding)) * 100);
   const ctx = agentContext(state);
   const readiness = computeReadiness({ documentIds: ctx.documentIds, campaignCompleted: ctx.campaigns.some((c) => c.status === "completed") });
+  const box = useGallaBox();
+  const boxOn = box.status === "usb" || box.status === "sim";
+  const overdue = khata.some((e) => e.due > 0 && e.dueInDays < 0);
+  useEffect(() => {
+    if (!boxOn) return;
+    // The OLED font has no ₹ glyph, so the device shows "Rs".
+    void sendToBox({ cmd: "display", l1: `Udhaar Rs ${formatNumber(outstanding)}`, l2: `Recovered Rs ${formatNumber(recovered)}` });
+    void sendToBox({ cmd: "led", color: overdue ? "amber" : "green" });
+  }, [boxOn, outstanding, recovered, overdue]);
   const clock = demoClock ? new Date(new Date().setHours(18, 10, 0, 0)) : new Date();
 
   const recordRepayment = (e: UdhaarEntry, amount: number) => {
@@ -131,7 +142,8 @@ export function UdhaarScreen() {
           </div>
         </Card>
 
-        <VoiceKhataCard note={note} setNote={setNote} onLog={logNote} canRecord={health.voice} onError={(m) => toast(m, "bad")} />
+        <VoiceKhataCard note={note} setNote={setNote} onLog={logNote} canRecord={health.voice} onError={(m) => toast(m, "bad")} ptt={box.pttAt} />
+        <GallaBoxCard />
 
         <Card as="section" aria-label="Udhaar customers" className="divide-y divide-line overflow-hidden">
           {khata.map((e) => {
@@ -205,9 +217,19 @@ export function UdhaarScreen() {
   );
 }
 
-function VoiceKhataCard({ note, setNote, onLog, canRecord, onError }: { note: string; setNote: (v: string) => void; onLog: (t: string) => void; canRecord: boolean; onError: (m: string) => void }) {
+function VoiceKhataCard({ note, setNote, onLog, canRecord, onError, ptt }: { note: string; setNote: (v: string) => void; onLog: (t: string) => void; canRecord: boolean; onError: (m: string) => void; ptt: number }) {
   const [recording, setRecording] = useState(false);
   const rec = useRef<MediaRecorder | null>(null);
+  const toggleRef = useRef<() => void>(() => {});
+  const pttSeen = useRef(ptt);
+
+  // Galla Box push-to-talk: records a voice note, or (without live speech) drops in a sample note.
+  useEffect(() => {
+    if (ptt === pttSeen.current) return;
+    pttSeen.current = ptt;
+    if (canRecord) toggleRef.current();
+    else setNote(SAMPLES[Math.floor(ptt / 1000) % SAMPLES.length]);
+  }, [ptt, canRecord, setNote]);
 
   const toggle = async () => {
     if (recording) return rec.current?.stop();
@@ -233,6 +255,8 @@ function VoiceKhataCard({ note, setNote, onLog, canRecord, onError }: { note: st
       onError("Microphone unavailable — type the note instead.");
     }
   };
+
+  toggleRef.current = toggle;
 
   return (
     <Card className="p-4">

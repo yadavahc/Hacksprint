@@ -6,6 +6,7 @@ import { BottomNav } from "@/components/bottom-nav/BottomNav";
 import { SheetHost } from "@/components/chat/sheets";
 import { DemoFinale, MobileDemoCaption } from "@/components/demo/DemoDirector";
 import { GallaScreen } from "@/components/galla/GallaScreen";
+import { GallaBoxBridge } from "@/components/hardware/GallaBox";
 import { BrandHeader } from "@/components/brand-header/BrandHeader";
 import { usePresentationMode } from "@/components/presentation-mode/PresentationModeContext";
 import { Button } from "@/components/ui/primitives";
@@ -63,6 +64,7 @@ export function GallaApplication() {
         </AnimatePresence>
       </div>
       <BottomNav />
+      <GallaBoxBridge />
       <Toasts />
       <VoiceOverlay />
       <SheetHost />
